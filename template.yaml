@@ -222,89 +222,89 @@ Resources:
         Properties:
             StateMachineName: DevelopingWithStepFunctions
             RoleArn: !GetAtt StepFunctionsServiceRole.Arn
-            DefinitionString: !Sub |
-            {
-                "Comment": "Developing with AWS Step Functions Demo",
-                "StartAt": "RegisterIncident",
-                "States": {
-                "RegisterIncident": {
-                    "Type": "Task",
-                    "Comment": "Register the plagiarism incident in the system and begin workflow execution.",
-                    "Resource": "${RegisterIncidentFunction.Arn}",
-                    "Next": "ScheduleExam"
-                },
-                "ScheduleExam": {
-                    "Type": "Task",
-                    "Comment": "Set the next exam deadline for the student to complete the exam.",
-                    "Resource": "${ScheduleExamFunction.Arn}",
-                    "Next": "SendNotification",
-                    "Catch": [
-                            {
-                                "ErrorEquals": [ "StudentExceededAllowableExamRetries" ],
-                                "ResultPath": "$.Error", 
-                                "Next": "TakeAdministrativeAction"
-                            }
-                            ]
-                },
-                "SendNotification": {
-                    "Type": "Task",
-                    "Comment": "Send email confirmation to the student with the date the exam completion deadline.",
-                    "Resource": "${SendExamNotificationFunction.Arn}",
-                    "Next": "ExamConfirmationPending"
-                },
-                "ExamConfirmationPending": {
-                    "Type": "Wait",
-                    "Comment": "Waiting period exam expiration deadline.",
-                    "TimestampPath": "$.exams[0].exam_date",
-                    "Next": "ValidateExamResults"
-                },
-                "ValidateExamResults": {
-                    "Comment": "Validates the exam results.",
-                    "Type": "Task",
-                    "Resource": "${ValidateExamResultsFunction.Arn}",
-                    "Next": "HasStudentPassedExam"
-                },
-                "HasStudentPassedExam": {
-                    "Type": "Choice",
-                    "Comment": "If the student has a score less than 67, they need to reschedule",
-                    "Choices": [{
-                        "Variable": "$.last_exam_score",
-                        "NumericGreaterThanEquals": 67,
-                        "Next": "ResolveIncident"
+            DefinitionString: !Sub |-
+                {
+                    "StartAt": "RegisterIncident",
+                    "Comment": "Developing with AWS Step Functions Demo",
+                    "States": {
+                    "RegisterIncident": {
+                        "Type": "Task",
+                        "Comment": "Register the plagiarism incident in the system and begin workflow execution.",
+                        "Resource": "${RegisterIncidentFunction.Arn}",
+                        "Next": "ScheduleExam"
                     },
-                    {
-                        "And": [{
+                    "ScheduleExam": {
+                        "Type": "Task",
+                        "Comment": "Set the next exam deadline for the student to complete the exam.",
+                        "Resource": "${ScheduleExamFunction.Arn}",
+                        "Next": "SendNotification",
+                        "Catch": [
+                                {
+                                    "ErrorEquals": [ "StudentExceededAllowableExamRetries" ],
+                                    "ResultPath": "$.Error", 
+                                    "Next": "TakeAdministrativeAction"
+                                }
+                                ]
+                    },
+                    "SendNotification": {
+                        "Type": "Task",
+                        "Comment": "Send email confirmation to the student with the date the exam completion deadline.",
+                        "Resource": "${SendExamNotificationFunction.Arn}",
+                        "Next": "ExamConfirmationPending"
+                    },
+                    "ExamConfirmationPending": {
+                        "Type": "Wait",
+                        "Comment": "Waiting period exam expiration deadline.",
+                        "TimestampPath": "$.exams[0].exam_date",
+                        "Next": "ValidateExamResults"
+                    },
+                    "ValidateExamResults": {
+                        "Comment": "Validates the exam results.",
+                        "Type": "Task",
+                        "Resource": "${ValidateExamResultsFunction.Arn}",
+                        "Next": "HasStudentPassedExam"
+                    },
+                    "HasStudentPassedExam": {
+                        "Type": "Choice",
+                        "Comment": "If the student has a score less than 67, they need to reschedule",
+                        "Choices": [{
                             "Variable": "$.last_exam_score",
-                            "NumericLessThan": 66
+                            "NumericGreaterThanEquals": 67,
+                            "Next": "ResolveIncident"
+                        },
+                        {
+                            "And": [{
+                                "Variable": "$.last_exam_score",
+                                "NumericLessThan": 66
+                            },
+                            {
+                                "Variable": "$.last_exam_score",
+                                "NumericGreaterThanEquals": 1
+                            }
+                            ],
+                            "Next": "ScheduleExam"
                         },
                         {
                             "Variable": "$.last_exam_score",
-                            "NumericGreaterThanEquals": 1
+                            "NumericEquals": 0,
+                            "Next": "TakeAdministrativeAction"
                         }
-                        ],
-                        "Next": "ScheduleExam"
+                        ]
                     },
-                    {
-                        "Variable": "$.last_exam_score",
-                        "NumericEquals": 0,
-                        "Next": "TakeAdministrativeAction"
+                    "TakeAdministrativeAction": {
+                        "Type": "Task",
+                        "Resource": "${TakeAdministrativeActionFunction.Arn}",
+                        "Comment": "Take administrative action if student does not sit exam or fails all three attempts.",
+                        "End": true
+                    },
+                    "ResolveIncident": {
+                        "Type": "Task",
+                        "Comment": "Resolves the incident for the student.",
+                        "End": true,
+                        "Resource": "${ResolveIncidentFunction.Arn}"
                     }
-                    ]
-                },
-                "TakeAdministrativeAction": {
-                    "Type": "Task",
-                    "Resource": "${TakeAdministrativeActionFunction.Arn}",
-                    "Comment": "Take administrative action if student does not sit exam or fails all three attempts.",
-                    "End": true
-                },
-                "ResolveIncident": {
-                    "Type": "Task",
-                    "Comment": "Resolves the incident for the student.",
-                    "End": true,
-                    "Resource": "${ResolveIncidentFunction.Arn}"
+                    }
                 }
-                }
-            }
 
 ########  ##    ## ##    ##    ###    ##     ##  #######  ########  ########  
 ##     ##  ##  ##  ###   ##   ## ##   ###   ### ##     ## ##     ## ##     ## 
@@ -349,17 +349,16 @@ Resources:
                     Service:
                         - "apigateway.amazonaws.com"
             Policies:
-                -
-                PolicyName: "CallStepFunctions"
-                PolicyDocument:
-                    Version: '2012-10-17'
-                    Statement:
-                    -
-                        Effect: "Allow"
-                        Action:
-                        - "states:StartExecution"
-                        Resource: 
-                        - !Ref DevelopingWithStepFunctionsStateMachine
+                -   PolicyName: "CallStepFunctions"
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                        -
+                            Effect: "Allow"
+                            Action:
+                            - "states:StartExecution"
+                            Resource: 
+                            - !Ref DevelopingWithStepFunctionsStateMachine
 
     StepFunctionsServiceRole:
         Type: "AWS::IAM::Role"
@@ -371,30 +370,28 @@ Resources:
             Version: "2012-10-17"
             Statement:
                 -
-                Sid: "AllowStepFunctionsServiceToAssumeRole"
-                Effect: "Allow"
-                Action: 
-                    - "sts:AssumeRole"
-                Principal:
-                    Service:
-                    - !Sub "states.${AWS::Region}.amazonaws.com"
+                    Sid: "AllowStepFunctionsServiceToAssumeRole"
+                    Effect: "Allow"
+                    Action: 
+                        - "sts:AssumeRole"
+                    Principal:
+                        Service:
+                        - !Sub "states.${AWS::Region}.amazonaws.com"
             Policies:
-            -
-                PolicyName: "CallLambdaFunctions"
+            -   PolicyName: "CallLambdaFunctions"
                 PolicyDocument:
                 Version: '2012-10-17'
                 Statement:
-                    -
-                    Effect: "Allow"
-                    Action:
-                        - "lambda:InvokeFunction"
-                    Resource: 
-                        - !Sub ${RegisterIncidentFunction.Arn}
-                        - !Sub ${ScheduleExamFunction.Arn}
-                        - !Sub ${SendExamNotificationFunction.Arn}
-                        - !Sub ${ValidateExamResultsFunction.Arn}
-                        - !Sub ${ResolveIncidentFunction.Arn}
-                        - !Sub ${TakeAdministrativeActionFunction.Arn}
+                    -   Effect: "Allow"
+                        Action:
+                            - "lambda:InvokeFunction"
+                        Resource: 
+                            - !Sub ${RegisterIncidentFunction.Arn}
+                            - !Sub ${ScheduleExamFunction.Arn}
+                            - !Sub ${SendExamNotificationFunction.Arn}
+                            - !Sub ${ValidateExamResultsFunction.Arn}
+                            - !Sub ${ResolveIncidentFunction.Arn}
+                            - !Sub ${TakeAdministrativeActionFunction.Arn}
 
  ######  ##    ##  ######  
 ##    ## ###   ## ##    ## 
