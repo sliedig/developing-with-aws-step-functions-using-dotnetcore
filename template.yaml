@@ -23,7 +23,7 @@ Parameters:
 
 Globals:
     Function:
-        Runtime: dotnetcore2.0
+        Runtime: dotnetcore2.1
         Timeout: 30
         Tracing: Active
         Environment:
@@ -136,77 +136,77 @@ Resources:
             DefinitionBody:
                 swagger: "2.0"
                 info:
-                version: "1.0"
-                title: "DevelopingWithStepFunctionsApi"
+                    version: "1.0"
+                    title: "DevelopingWithStepFunctionsApi"
                 basePath: "/v1"
                 schemes:
                 - "https"
                 paths:
-                /incident:
-                    post:
-                    consumes:
-                    - "application/json"
-                    produces:
-                    - "application/json"
-                    responses:
-                        "200":
-                        description: "200 response"
-                        schema:
-                            $ref: "#/definitions/Empty"
-                        headers:
-                            Access-Control-Allow-Origin:
-                            type: "string"
-                    x-amazon-apigateway-integration:
-                        credentials: !GetAtt ApiGatewayStepFunctionsRole.Arn
-                        uri: !Sub "arn:aws:apigateway:${AWS::Region}:states:action/StartExecution"
-                        responses:
-                        default:
-                            statusCode: "200"
-                            responseParameters:
-                            method.response.header.Access-Control-Allow-Origin: "'*'"
-                        requestTemplates:
-                        application/json: !Sub |
-                            {
-                            "input": "$util.escapeJavaScript($input.json('$'))",
-                            "name": "$context.requestId",
-                            "stateMachineArn": "${DevelopingWithStepFunctionsStateMachine}"
-                            }
-                        passthroughBehavior: "when_no_templates"
-                        httpMethod: "POST"
-                        type: "aws"
-                    options:
-                    consumes:
-                    - "application/json"
-                    produces:
-                    - "application/json"
-                    responses:
-                        "200":
-                        description: "200 response"
-                        schema:
-                            $ref: "#/definitions/Empty"
-                        headers:
-                            Access-Control-Allow-Origin:
-                            type: "string"
-                            Access-Control-Allow-Methods:
-                            type: "string"
-                            Access-Control-Allow-Headers:
-                            type: "string"
-                    x-amazon-apigateway-integration:
-                        responses:
-                        default:
-                            statusCode: "200"
-                            responseParameters:
-                            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
-                            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-                            method.response.header.Access-Control-Allow-Origin: "'*'"
-                        requestTemplates:
-                        application/json: "{\"statusCode\": 200}"
-                        passthroughBehavior: "when_no_match"
-                        type: "mock"
+                    /incident:
+                        post:
+                            consumes:
+                            - "application/json"
+                            produces:
+                            - "application/json"
+                            responses:
+                                "200":
+                                    description: "200 response"
+                                    schema:
+                                        $ref: "#/definitions/Empty"
+                                    headers:
+                                        Access-Control-Allow-Origin:
+                                            type: "string"
+                            x-amazon-apigateway-integration:
+                                credentials: !GetAtt ApiGatewayStepFunctionsRole.Arn
+                                uri: !Sub "arn:aws:apigateway:${AWS::Region}:states:action/StartExecution"
+                                responses:
+                                    default:
+                                        statusCode: "200"
+                                        responseParameters:
+                                            method.response.header.Access-Control-Allow-Origin: "'*'"
+                                requestTemplates:
+                                    application/json: !Sub |
+                                        {
+                                        "input": "$util.escapeJavaScript($input.json('$'))",
+                                        "name": "$context.requestId",
+                                        "stateMachineArn": "${DevelopingWithStepFunctionsStateMachine}"
+                                        }
+                                passthroughBehavior: "when_no_templates"
+                                httpMethod: "POST"
+                                type: "aws"
+                        options:
+                            consumes:
+                            - "application/json"
+                            produces:
+                            - "application/json"
+                            responses:
+                                "200":
+                                    description: "200 response"
+                                    schema:
+                                        $ref: "#/definitions/Empty"
+                                    headers:
+                                        Access-Control-Allow-Origin:
+                                            type: "string"
+                                        Access-Control-Allow-Methods:
+                                            type: "string"
+                                        Access-Control-Allow-Headers:
+                                            type: "string"
+                            x-amazon-apigateway-integration:
+                                responses:
+                                    default:
+                                        statusCode: "200"
+                                        responseParameters:
+                                            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+                                            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                                            method.response.header.Access-Control-Allow-Origin: "'*'"
+                                requestTemplates:
+                                    application/json: "{\"statusCode\": 200}"
+                                passthroughBehavior: "when_no_match"
+                                type: "mock"
                 definitions:
-                Empty:
-                    type: "object"
-                    title: "Empty Schema"
+                    Empty:
+                        type: "object"
+                        title: "Empty Schema"
          
 
  ######  ######## ######## ########     ######## ##     ## ##    ##  ######  ######## ####  #######  ##    ## 
@@ -220,7 +220,7 @@ Resources:
     DevelopingWithStepFunctionsStateMachine:
         Type: "AWS::StepFunctions::StateMachine"
         Properties:
-            StateMachineName: DevelopingWithStepFunctions
+            StateMachineName: DevelopingWithStepFunctionsDotNetCore
             RoleArn: !GetAtt StepFunctionsServiceRole.Arn
             DefinitionString: !Sub |-
                 {
@@ -346,8 +346,8 @@ Resources:
                     Action: 
                     - "sts:AssumeRole"
                     Principal:
-                    Service:
-                        - "apigateway.amazonaws.com"
+                        Service:
+                            - "apigateway.amazonaws.com"
             Policies:
                 -   PolicyName: "CallStepFunctions"
                     PolicyDocument:
@@ -365,33 +365,33 @@ Resources:
         Properties:
             Path: !Join ["", ["/", !Ref "AWS::StackName", "/"]]
             ManagedPolicyArns:
-            - "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess"
+                - "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess"
             AssumeRolePolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-                -
-                    Sid: "AllowStepFunctionsServiceToAssumeRole"
-                    Effect: "Allow"
-                    Action: 
-                        - "sts:AssumeRole"
-                    Principal:
-                        Service:
-                        - !Sub "states.${AWS::Region}.amazonaws.com"
-            Policies:
-            -   PolicyName: "CallLambdaFunctions"
-                PolicyDocument:
-                Version: '2012-10-17'
+                Version: "2012-10-17"
                 Statement:
-                    -   Effect: "Allow"
-                        Action:
-                            - "lambda:InvokeFunction"
-                        Resource: 
-                            - !Sub ${RegisterIncidentFunction.Arn}
-                            - !Sub ${ScheduleExamFunction.Arn}
-                            - !Sub ${SendExamNotificationFunction.Arn}
-                            - !Sub ${ValidateExamResultsFunction.Arn}
-                            - !Sub ${ResolveIncidentFunction.Arn}
-                            - !Sub ${TakeAdministrativeActionFunction.Arn}
+                    -
+                        Sid: "AllowStepFunctionsServiceToAssumeRole"
+                        Effect: "Allow"
+                        Action: 
+                            - "sts:AssumeRole"
+                        Principal:
+                            Service:
+                                - !Sub "states.${AWS::Region}.amazonaws.com"
+            Policies:
+                -   PolicyName: "CallLambdaFunctions"
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            -   Effect: "Allow"
+                                Action:
+                                    - "lambda:InvokeFunction"
+                                Resource: 
+                                    - !Sub ${RegisterIncidentFunction.Arn}
+                                    - !Sub ${ScheduleExamFunction.Arn}
+                                    - !Sub ${SendExamNotificationFunction.Arn}
+                                    - !Sub ${ValidateExamResultsFunction.Arn}
+                                    - !Sub ${ResolveIncidentFunction.Arn}
+                                    - !Sub ${TakeAdministrativeActionFunction.Arn}
 
  ######  ##    ##  ######  
 ##    ## ###   ## ##    ## 
@@ -406,7 +406,7 @@ Resources:
         Properties:
             Subscription:
             - Endpoint: !Ref NotificationEmail
-            Protocol: email
+              Protocol: email
 
 Outputs:
     StepFunctionsAPIUrl:
