@@ -35,6 +35,27 @@ namespace ResolveIncidentTask
             state.IncidentResolved = true;
             state.ResolutionDate = DateTime.Now;
 
+            Document incidentDocument = BuildIncidentDocument(state);
+
+            var table = Table.LoadTable(_client, _table);
+            table.PutItemAsync(incidentDocument);
+        }
+
+        private static Document BuildIncidentDocument(IncidentState state)
+        {
+            var examsList = new DynamoDBList();
+
+            foreach (var exam in state.Exams)
+            {
+                var examMap = new Document
+                {
+                    {"ExamId", exam.ExamId},
+                    {"ExamDate", exam.ExamDate},
+                    {"Score", exam.Score}
+                };
+
+                examsList.Add(examMap);
+            }
 
             var incidentDocument = new Document
             {
@@ -43,14 +64,10 @@ namespace ResolveIncidentTask
                 ["IncidentDate"] = state.IncidentDate,
                 ["AdminActionRequired"] = state.AdminActionRequired,
                 ["IncidentResolved"] = state.IncidentResolved,
-                ["ResolutionDate"] = state.ResolutionDate
+                ["ResolutionDate"] = state.ResolutionDate,
+                ["Exams"] = examsList
             };
-
-
-            var table = Table.LoadTable(_client, _table);
-
-            // Persist to DynamoDB
-            table.PutItemAsync(incidentDocument);
+            return incidentDocument;
         }
     }
 }
