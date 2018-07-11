@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Amazon.Lambda.Core;
-using PlagiarismIncidentSystem;
+using IncidentState;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -17,7 +17,7 @@ namespace RegisterIncidentTask
         /// <param name="state"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public IncidentState FunctionHandler(IncidentState state, ILambdaContext context)
+        public State FunctionHandler(State state, ILambdaContext context)
         {
 
             state.IncidentId = Guid.NewGuid();

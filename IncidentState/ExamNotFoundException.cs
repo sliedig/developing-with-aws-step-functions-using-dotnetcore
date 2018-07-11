@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace PlagiarismIncidentSystem
+namespace IncidentState
 {
   public class ExamNotFoundException : Exception
   {
     public ExamNotFoundException()
     { 
     }
-    public ExamNotFoundException(string message) : base(message)
+    public ExamNotFoundException(string message) : base((string) message)
     {
     }
   }

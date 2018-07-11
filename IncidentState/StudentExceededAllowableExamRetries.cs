@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PlagiarismIncidentSystem
+namespace IncidentState
 {
     /// <summary>
     /// Custom Exception for students that have exceeded the allowable number of exam retries.
@@ -12,7 +12,7 @@ namespace PlagiarismIncidentSystem
         {
         }
 
-        public StudentExceededAllowableExamRetries(string message) : base(message)
+        public StudentExceededAllowableExamRetries(string message) : base((string) message)
         {
         }
     }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PlagiarismIncidentSystem
+namespace IncidentState
 {
-    public class IncidentState
+    public class State
     {
         public string StudentId { get; set; }
         public Guid IncidentId { get; set; }

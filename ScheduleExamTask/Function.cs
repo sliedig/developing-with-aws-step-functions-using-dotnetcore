@@ -1,6 +1,6 @@
 using System;
 using Amazon.Lambda.Core;
-using PlagiarismIncidentSystem;
+using IncidentState;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -18,7 +18,7 @@ namespace ScheduleExamTask
     /// <param name="state">Incident State object</param>
     /// <param name="context">Lambda Context</param>
     /// <returns></returns>
-    public IncidentState FunctionHandler(IncidentState state, ILambdaContext context)
+    public State FunctionHandler(State state, ILambdaContext context)
     {
       var exam = new Exam(Guid.NewGuid(), DateTime.Now.AddSeconds(10), 0);
 

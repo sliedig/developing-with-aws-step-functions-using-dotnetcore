@@ -4,7 +4,7 @@ using Amazon;
 using Amazon.Lambda.Core;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
-using PlagiarismIncidentSystem;
+using IncidentState;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -28,7 +28,7 @@ namespace SendNotificationTask
     /// <param name="state"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public IncidentState FunctionHandler(IncidentState state, ILambdaContext context)
+    public State FunctionHandler(State state, ILambdaContext context)
     {
 
       var nextExam = state.Exams.LastOrDefault();

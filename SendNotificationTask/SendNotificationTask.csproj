@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PlagiarismIncidentSystem\PlagiarismIncidentSystem.csproj" />
+    <ProjectReference Include="..\IncidentState\IncidentState.csproj" />
   </ItemGroup>
 
 </Project>

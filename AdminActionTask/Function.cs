@@ -1,22 +1,45 @@
+using System;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.Core;
+using IncidentPersistence;
+using IncidentState;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
+// Assembly attribute to enable the Lambda function's JSON state to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace AdminActionTask
 {
     public class Function
     {
-        
+        private readonly AmazonDynamoDBClient _client;
+        private readonly string _table;
+
+        public Function()
+        {
+            _client = new AmazonDynamoDBClient(RegionEndpoint.APSoutheast2);
+            _table = Environment.GetEnvironmentVariable("TABLE_NAME");
+        }
+
         /// <summary>
         /// A simple function that takes a string and does a ToUpper
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="state"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public void FunctionHandler(State state, ILambdaContext context)
         {
-            return input?.ToUpper();
+            state.AdminActionRequired = true;
+            state.IncidentResolved = false;
+            state.ResolutionDate = DateTime.Now;
+
+            Document incidentDocument = IncidentDocument.BuildIncidentDocument(state);
+
+            var table = Table.LoadTable(_client, _table);
+            table.PutItemAsync(incidentDocument);
         }
+
+       
     }
 }
