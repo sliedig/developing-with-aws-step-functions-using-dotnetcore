@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.3.0" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.1.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PlagiarismIncidentState\PlagiarismIncidentState.csproj" />
+    <ProjectReference Include="..\PlagiarismIncidentSystem\PlagiarismIncidentSystem.csproj" />
   </ItemGroup>
 
 </Project>

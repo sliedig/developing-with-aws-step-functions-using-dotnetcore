@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace PlagiarismIncidentState
+namespace PlagiarismIncidentSystem
 {
     public class IncidentState
     {
@@ -12,7 +11,7 @@ namespace PlagiarismIncidentState
         public List<Exam> Exams { get; set; }
         public DateTime? ResolutionDate { get; set; }
         public bool IncidentResolved { get; set; }
-
+        public bool AdminActionRequired { get; set; }
     }
 
     public class Exam
@@ -32,4 +31,5 @@ namespace PlagiarismIncidentState
             Score = score;
         }
     }
+
 }

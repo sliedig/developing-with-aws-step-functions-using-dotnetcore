@@ -1,27 +1,59 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-
+using Amazon;
 using Amazon.Lambda.Core;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
+using PlagiarismIncidentSystem;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace SendNotificationTask
 {
-    public class Function
+  public class Function
+  {
+    private AmazonSimpleNotificationServiceClient _client;
+    private string _topicArn;
+
+    public Function()
     {
-        
-        /// <summary>
-        /// A simple function that takes a string and does a ToUpper
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
-        {
-            return input?.ToUpper();
-        }
+      _client = new AmazonSimpleNotificationServiceClient(RegionEndpoint.APSoutheast2);
+      _topicArn = Environment.GetEnvironmentVariable("TOPIC_ARN");
     }
+
+    /// <summary>
+    /// Function to send student email about their next scheduled exam.
+    /// </summary>
+    /// <param name="state"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public IncidentState FunctionHandler(IncidentState state, ILambdaContext context)
+    {
+
+      var nextExam = state.Exams.LastOrDefault();
+
+      if (nextExam != null)
+      {
+        var message = $"Dear Student ID {state.StudentId}, you have until {nextExam.ExamDate} to complete you Plagiarism Violation test. Thank you.";
+        var subject = $"Exam Notification for {state.StudentId}";
+
+        _client.PublishAsync(new PublishRequest
+        {
+          Subject = subject,
+          Message = message,
+          TopicArn = _topicArn
+        });
+
+      }
+      else
+      {
+        throw new ExamNotFoundException();
+      }
+
+
+
+      return state;
+    }
+  }
 }

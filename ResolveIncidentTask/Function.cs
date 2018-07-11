@@ -1,27 +1,56 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.Core;
+using PlagiarismIncidentSystem;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
+// Assembly attribute to enable the Lambda function's JSON state to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace ResolveIncidentTask
 {
     public class Function
     {
-        
+        private AmazonDynamoDBClient _client;
+        private string _table;
+
+
+        public Function()
+        {
+            _client = new AmazonDynamoDBClient(RegionEndpoint.APSoutheast2);
+            _table = Environment.GetEnvironmentVariable("TABLE_NAME");
+        }
+
         /// <summary>
-        /// A simple function that takes a string and does a ToUpper
+        /// Function to resolve the incident and cpmplete the workflow.
+        /// All state data is persisted.
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="state"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public void FunctionHandler(IncidentState state, ILambdaContext context)
         {
-            return input?.ToUpper();
+            state.AdminActionRequired = false;
+            state.IncidentResolved = true;
+            state.ResolutionDate = DateTime.Now;
+
+
+            var incidentDocument = new Document
+            {
+                ["IncidentId"] = state.IncidentId,
+                ["StudentId"] = state.StudentId,
+                ["IncidentDate"] = state.IncidentDate,
+                ["AdminActionRequired"] = state.AdminActionRequired,
+                ["IncidentResolved"] = state.IncidentResolved,
+                ["ResolutionDate"] = state.ResolutionDate
+            };
+
+
+            var table = Table.LoadTable(_client, _table);
+
+            // Persist to DynamoDB
+            table.PutItemAsync(incidentDocument);
         }
     }
 }

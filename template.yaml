@@ -318,7 +318,7 @@ Resources:
         Type: AWS::Serverless::SimpleTable
         Properties:
             PrimaryKey:
-                Name: incident_id
+                Name: IncidentId
                 Type: String
             ProvisionedThroughput:
                 ReadCapacityUnits: 5

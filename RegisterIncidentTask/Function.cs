@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Amazon.Lambda.Core;
+using PlagiarismIncidentSystem;
+
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -7,16 +11,21 @@ namespace RegisterIncidentTask
 {
     public class Function
     {
-        
         /// <summary>
         /// A simple function that takes a string and does a ToUpper
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="state"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public IncidentState FunctionHandler(IncidentState state, ILambdaContext context)
         {
-            return input?.ToUpper();
+
+            state.IncidentId = Guid.NewGuid();
+            state.Exams = new List<Exam>();
+            state.IncidentResolved = false;
+
+            return state;
+
         }
     }
 }

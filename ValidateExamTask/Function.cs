@@ -1,27 +1,30 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-
 using Amazon.Lambda.Core;
+using PlagiarismIncidentSystem;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
+// Assembly attribute to enable the Lambda function's JSON state to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace ValidateExamTask
 {
     public class Function
     {
-        
+
         /// <summary>
-        /// A simple function that takes a string and does a ToUpper
+        /// Function to validate the exam result.
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="state"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public IncidentState FunctionHandler(IncidentState state, ILambdaContext context)
         {
-            return input?.ToUpper();
+
+            // Generating a ramdom score. This would otherwise be calling an external system.
+            var lastExam = state.Exams.LastOrDefault();
+            lastExam.Score = new Random().Next(0, 100);
+
+            return state;
         }
     }
 }
