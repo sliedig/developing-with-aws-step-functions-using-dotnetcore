@@ -21,7 +21,7 @@ namespace ValidateExamTask
         {
 
             // Generating a ramdom score. This would otherwise be calling an external system.
-            var lastExam = state.Exams.LastOrDefault();
+            var lastExam = state.Exams[0];
             lastExam.Score = new Random().Next(0, 100);
 
             return state;

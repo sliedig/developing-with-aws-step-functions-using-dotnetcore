@@ -3,6 +3,7 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.Core;
+using Amazon.Runtime;
 using IncidentPersistence;
 using IncidentState;
 
@@ -38,8 +39,26 @@ namespace ResolveIncidentTask
 
             Document incidentDocument = IncidentDocument.BuildIncidentDocument(state);
 
-            var table = Table.LoadTable(_client, _table);
-            table.PutItemAsync(incidentDocument);
+            try
+            {
+                var table = Table.LoadTable(_client, _table);
+                table.PutItemAsync(incidentDocument);
+            }
+            catch (AmazonDynamoDBException e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+            catch (AmazonServiceException e)
+            { 
+                Console.WriteLine(e.Message);
+                throw;
+            }
+            catch (Exception e)
+            { 
+                Console.WriteLine(e.Message);
+                throw;
+            }
         }
     }
 }
