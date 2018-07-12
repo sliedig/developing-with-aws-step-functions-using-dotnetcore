@@ -32,7 +32,7 @@ All resources for this architecture are deployed using Amazon CloudFormation and
 To deploy the template we simply run two AWS CLI commands in the CloudFormation API. The package takes our SAM template as an input and we specify an file name as an output. CloudFormation will package all our function code and upload it to the specified S3 bucket, substituting the Code Uri property values with the location of the zipped up functions in the S3 bucket.
 
 ``` bash
-aws cloudformation package \
+sam package \
     --template-file template.yaml \
     --output-template-file packaged.yaml \
     --s3-bucket developingwithstepfunctions
@@ -41,7 +41,7 @@ aws cloudformation package \
 Once the package has been created, execute the deploy command to create the application stack
 
 ``` bash
-aws cloudformation deploy \
+sam deploy \
     --template-file packaged.yaml \
     --stack-name developing-with-step-functions \
     --capabilities CAPABILITY_IAM
@@ -55,17 +55,15 @@ Services used in the pipeline include:
 * [AWS Code Build](https://aws.amazon.com/codebuild/)
 * [AWS CloudFormation](https://aws.amazon.com/cloudformation/)
 
-Using Code Deploy allows us to use on-demand build environments, which are configured using a `buildspec.yaml` file.
-
 ![Developing With Step Functions Pipeline](pipeline.png "Developing With Step Functions Pipeline")
 
 ## Credits
 
-### Cookiecutter SAM for Python Lambda
+### Cookiecutter SAM for DotNet Lambda functions
 
-The application was initialised using the Cookiecutter SAM for Python Lambda. The cookiecutter template provides a wizard like command line experience to create a Serverless app based on SAM and Python 3.6.
+The application was initialised using the Cookiecutter SAM for DotNet Lambda functions. The cookiecutter template provides a wizard like command line experience to create a Serverless app based on SAM and .NET Core 2.1.
 
-For more details check out Heitor Lessa's repository at  [heitorlessa/cookiecutter-aws-sam-python](https://github.com/heitorlessa/cookiecutter-aws-sam-python)
+For more details check out Heitor Lessa's repository at `todo: enter url here`
 
 Also, a great video tutorial on how to use the Cookiecutter (and more) can be found on the AWS Twitch channel - [Build on Serverless | Building the "Simple Crypto Service" Python Project](https://www.twitch.tv/videos/248791444##)
 
